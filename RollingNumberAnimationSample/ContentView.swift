@@ -7,30 +7,36 @@
 
 import SwiftUI
 
+final class ViewModel: ObservableObject {
+    @Published var number: Int = 0
+
+    func increment(adding: Int) {
+        withAnimation {
+            number += adding
+        }
+    }
+}
+
 struct ContentView: View {
-    @State var number = 0
+    @StateObject var viewModel: ViewModel = .init()
 
     var body: some View {
         VStack(spacing: 32) {
-            Text(number.description)
-                .modifier(RollingNumberAnimation(number: number))
+            RollingNumberAnimatableView(number: viewModel.number)
+                .frame(width: 100)
 
             Button("+10") {
-                withAnimation {
-                    number += 10
-                }
+                viewModel.increment(adding: 10)
             }
 
             Button("+100") {
-                withAnimation {
-                    number += 100
-                }
+                viewModel.increment(adding: 100)
             }
         }
     }
 }
 
-struct RollingNumberAnimation: AnimatableModifier {
+struct RollingNumberAnimatableView: View, Animatable {
     var number: Int
 
     var animatableData: CGFloat {
@@ -38,8 +44,8 @@ struct RollingNumberAnimation: AnimatableModifier {
         set { number = Int(newValue) }
     }
 
-    func body(content: Content) -> some View {
-        Text(number.description)
+    var body: some View {
+        Text("\(number) 件")
     }
 }
 
